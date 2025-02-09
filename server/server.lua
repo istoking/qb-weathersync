@@ -38,15 +38,13 @@ local function nextWeatherStage()
         CurrentWeather = (math.random(1, 5) > 2) and "CLEARING" or "OVERCAST" -- 60/40 chance
     elseif CurrentWeather == "CLEARING" or CurrentWeather == "OVERCAST" then
         local new = math.random(1, 6)
-        if new == 1 then CurrentWeather = (CurrentWeather == "CLEARING") and "FOGGY" or "RAIN"
+        if new == 1 then CurrentWeather = (CurrentWeather == "CLEARING") or "RAIN"
         elseif new == 2 then CurrentWeather = "CLOUDS"
         elseif new == 3 then CurrentWeather = "CLEAR"
         elseif new == 4 then CurrentWeather = "EXTRASUNNY"
-        elseif new == 5 then CurrentWeather = "SMOG"
-        else CurrentWeather = "FOGGY"
+        else CurrentWeather = "CLEAR"
         end
     elseif CurrentWeather == "THUNDER" or CurrentWeather == "RAIN" then CurrentWeather = "CLEARING"
-    elseif CurrentWeather == "SMOG" or CurrentWeather == "FOGGY" then CurrentWeather = "CLEAR"
     else CurrentWeather = "CLEAR"
     end
     TriggerEvent("qb-weathersync:server:RequestStateSync")
@@ -133,7 +131,13 @@ local function retrieveTimeFromApi(callback)
                     callback(data.unixtime)
                 end
             else
-                callback(nil)
+                --callback(nil)
+                if Config.ServerTimeSync then
+                    local unixtime = os.time()
+                    callback(unixtime)
+                else
+                    callback(nil)
+                end
             end
         end, "GET", nil, nil)
     end)
